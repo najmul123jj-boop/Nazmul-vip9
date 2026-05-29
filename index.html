@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>NAZMUl VIP</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <style>
+        html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
+        
+        /* Full view container to clearly see the betting area at the bottom of the game screen */
+        .iframe-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow-y: auto; /* Allow scrolling to the bottom to see the betting room */
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Upgraded iframe logic to make text and bottom options crystal clear */
+        iframe { 
+            width: 100%; 
+            height: 100%; /* Perfect height along the screen so the bottom bet panel isn't blocked */
+            border: none; 
+            display: block;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+        
+        /* Ultra-premium RGB neon animation for the entire panel */
+        @keyframes ultraRgbGlow {
+            0% { border-color: #00ffcc; box-shadow: 0 0 12px #00ffcc, inset 0 0 6px rgba(0, 255, 204, 0.3); }
+            33% { border-color: #ff007f; box-shadow: 0 0 12px #ff007f, inset 0 0 6px rgba(255, 0, 127, 0.3); }
+            66% { border-color: #ffd700; box-shadow: 0 0 12px #ffd700, inset 0 0 6px rgba(255, 215, 0, 0.3); }
+            100% { border-color: #00ffcc; box-shadow: 0 0 12px #00ffcc, inset 0 0 6px rgba(0, 255, 204, 0.3); }
+        }
+
+        /* Panel overlay design - compact size */
+        .box { 
+            width: 155px; 
+            height: auto;
+            background: linear-gradient(135deg, rgba(10, 5, 20, 0.98), rgba(4, 2, 8, 0.99));
+            border: 2px solid #00ffcc; 
+            border-radius: 16px; 
+            color: #fff; text-align: center; padding: 10px 8px; 
+            position: fixed; top: 120px; right: 10px;
+            z-index: 9999; cursor: grab; backdrop-filter: blur(25px); 
+            box-sizing: border-box;
+            animation: ultraRgbGlow 5s infinite linear;
+            touch-action: none; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .box:active { cursor: grabbing; }
+
+        /* Premium header style */
+        .panel-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            width: 100%;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            padding-bottom: 5px;
+        }
+
+        /* Ultra-modern logo animation */
+        .premium-logo-area {
+            position: relative;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 1.5px dashed #00ffcc;
+            border-radius: 50%;
+            animation: spinRing 4s infinite linear;
+        }
+
+        @keyframes spinRing {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* VIP server badge */
+        .server-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            background: rgba(255, 215, 0, 0.07);
+            border: 1px solid #ffd700;
+            border-radius: 4px;
+            padding: 1px 4px;
+            font-size: 8px;
+            font-weight: 900;
+            color: #ffd700;
+            text-transform: uppercase;
+            width: 100%;
+            box-sizing: border-box;
+            letter-spacing: 0.5px;
+        }
+        
+        .vpn-dot {
+            width: 5px;
+            height: 5px;
+            background-color: #39ff14;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 5px #39ff14;
+        }
+
+        /* Login design */
+        #loginPart { 
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            width: 100%; 
+        }
+        #loginPart input { 
+            width: 100%; padding: 5px; background: #05050a; border: 1.2px solid #ff007f; 
+            border-radius: 6px; color: #fff; font-size: 11px; text-align: center; 
+            outline: none; box-sizing: border-box;
+        }
+        .login-btn { 
+            width: 100%; padding: 6px; background: linear-gradient(45deg, #00ffcc, #ff007f); color: #fff; 
+            border: none; border-radius: 6px; font-weight: 900; cursor: pointer; 
+            font-size: 10px; text-transform: uppercase; text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        /* Inner part of the signal panel */
+        #appPart { 
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            gap: 5px;
+            width: 100%; 
+        }
+        
+        .period-top-box {
+            background: rgba(255, 255, 255, 0.02); 
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px; 
+            padding: 3px; 
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .period-label { font-size: 8px; color: #bbb; text-transform: uppercase; display: block; font-weight: 600; letter-spacing: 0.3px; }
+        
+        #periodID { 
+            font-size: 12px; 
+            font-weight: 950; 
+            display: block; 
+            margin-top: 1px; 
+            word-break: break-all;
+        }
+        
+        /* Neon period text */
+        .p-cyan { color: #00ffcc; text-shadow: 0 0 4px #00ffcc; }
+        .p-pink { color: #ff007f; text-shadow: 0 0 4px #ff007f; }
+        .p-gold { color: #ffd700; text-shadow: 0 0 4px #ffd700; }
+        .p-green { color: #39ff14; text-shadow: 0 0 4px #39ff14; }
+
+        /* Timer */
+        .timer-container { text-align: center; width: 100%; }
+        .timer-txt { font-size: 14px; color: #ffff00; font-weight: 900; text-shadow: 0 0 5px #ffff00; }
+        
+        /* Signal display */
+        #signalContainer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            width: 100%;
+            padding-bottom: 2px;
+        }
+
+        .signal-txt { 
+            font-size: 26px; 
+            font-weight: 950; 
+            text-transform: uppercase; 
+            line-height: 1.1; 
+        }
+
+        .res-big { color: #00ffcc; text-shadow: 0 0 12px #00ffcc; }
+        .res-small { color: #ff007f; text-shadow: 0 0 12px #ff007f; }
+        .processing { font-size: 11px; color: #ffea00; animation: blink 0.4s infinite; text-shadow: 0 0 4px #ffea00; display: block; font-weight: 900; }
+        
+        @keyframes blink { 50% { opacity: 0.3; } }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <!-- Iframe screen container (logic to show bottom betting part completely) -->
+    <div class="iframe-container">
+        <iframe src="https://hgnice.cc/#/register?invitationCode=511711502736"></iframe>
+    </div>
+
+    <!-- Main upgraded mini panel box -->
+    <div class="box" id="dragBox">
+        
+        <!-- Top header area -->
+        <div class="panel-header">
+            <!-- Hi-tech animated circle logo -->
+            <div class="premium-logo-area">
+                <div class="logo-ring"></div>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#00ffcc"/>
+                    <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="#ff007f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <!-- Server badge -->
+            <div class="server-badge">
+                <span>VIP</span>
+                <div class="vpn-dot"></div>
+            </div>
+        </div>
+
+        <!-- Login part -->
+        <div id="loginPart">
+            <input type="password" id="passInput" placeholder="Password">
+            <button class="login-btn" onclick="checkPass()">Login</button>
+        </div>
+
+        <!-- Hack signal panel -->
+        <div id="appPart" class="hidden">
+            <div class="period-top-box">
+                <span class="period-label">Live Period</span>
+                <span id="periodID">....</span>
+            </div>
+            
+            <div class="timer-container">
+                <div class="timer-txt"><span id="timer">--</span>s</div>
+            </div>
+            
+            <div id="signalContainer">
+                <div class="signal-txt" id="prediction">WAIT</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyA4MXyCyvpAL8NQ23j3TWxiszPofWInVA",
+            authDomain: "wingo-ai-624fb.firebaseapp.com",
+            databaseURL: "https://wingo-ai-624fb-default-rtdb.firebaseio.com",
+            projectId: "wingo-ai-624fb",
+            appId: "1:266167882150:web:7f0f83606dfd4bcd8aff67"
+        };
+        firebase.initializeApp(firebaseConfig);
+        
+        let lastP = null, _active = false;
+
+        function checkPass() {
+            if (document.getElementById('passInput').value.trim() === "VIP100OK") {
+                document.getElementById('loginPart').classList.add('hidden'); 
+                document.getElementById('appPart').classList.remove('hidden'); 
+                _active = true;
+                setInterval(loop, 1000);
+                setInterval(fetchData, 2000);
+            } else { 
+                alert("❌ Wrong Password!"); 
+            }
+        }
+
+        function renderRgbPeriod(periodStr) {
+            if (!periodStr || periodStr === "....") return "....";
+            const classes = ["p-cyan", "p-pink", "p-gold", "p-green"];
+            let htmlResult = "";
+            for (let i = 0; i < periodStr.length; i++) {
+                let cls = classes[i % classes.length];
+                if (i >= periodStr.length - 4) {
+                    htmlResult += `<span class="${cls}">${periodStr[i]}</span>`;
+                } else {
+                    htmlResult += `<span>${periodStr[i]}</span>`;
+                }
+            }
+            return htmlResult;
+        }
+
+        async function fetchData() {
+            try {
+                const res = await fetch("https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json?r=" + Date.now());
+                const json = await res.json();
+                if (json.data?.list.length > 0) {
+                    lastP = (BigInt(json.data.list[0].issueNumber) + 1n).toString();
+                }
+            } catch (e) { 
+                const now = new Date();
+                const totalSeconds = Math.floor(now.getTime() / 1000);
+                lastP = Math.floor(totalSeconds / 60).toString(); 
+            }
+        }
+
+        function analyzeQuantumSignal(period) {
+            let hash1 = 0; 
+            const seed1 = period + "DKWIN_SG_SERVER_SECURE_2026_1M_NUM_A";
+            
+            for (let i = 0; i < seed1.length; i++) {
+                hash1 = ((hash1 << 5) - hash1) + seed1.charCodeAt(i);
+                hash1 |= 0;
+            }
+            
+            let num1 = Math.abs(hash1) % 10;
+            let sizeResult = (num1 >= 5) ? "BIG" : "SMALL";
+            return { size: sizeResult };
+        }
+
+        function loop() {
+            if (!_active) return;
+            const now = new Date();
+            const sec = now.getSeconds();
+            
+            const pBox = document.getElementById('periodID');
+            if(lastP) {
+                pBox.innerHTML = renderRgbPeriod(lastP);
+            } else {
+                pBox.innerText = "....";
+            }
+            
+            let rem = 60 - sec;
+            if (rem === 60) rem = 0; 
+            
+            document.getElementById('timer').innerText = rem < 10 ? "0" + rem : rem;
+
+            const sigBox = document.getElementById('prediction');
+            
+            if (rem <= 5 || rem === 0) {
+                sigBox.innerHTML = '<span class="processing">GENERATING...</span>';
+            } else {
+                const result = analyzeQuantumSignal(lastP || "0");
+                sigBox.innerHTML = `<span class="res-${result.size.toLowerCase()}">${result.size}</span>`;
+            }
+        }
+
+        // Smooth dragging system
+        const box = document.getElementById("dragBox");
+        let active = false, currentX = 0, currentY = 0, initialX = 0, initialY = 0;
+
+        function dragStart(e) {
+            if(e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest('svg') || e.target.classList.contains('vpn-dot') || e.target.closest('#periodID') || e.target.classList.contains('logo-ring')) return;
+            
+            const clientX = e.type === "touchstart" ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === "touchstart" ? e.touches[0].clientY : e.clientY;
+            
+            initialX = clientX - currentX;
+            initialY = clientY - currentY;
+            active = true;
+        }
+
+        function dragEnd() { active = false; }
+
+        function drag(e) {
+            if (active) {
+                e.preventDefault();
+                const clientX = e.type === "touchmove" ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type === "touchmove" ? e.touches[0].clientY : e.clientY;
+                
+                currentX = clientX - initialX;
+                currentY = clientY - initialY;
+                
+                box.style.transform = `translate(${currentX}px, ${currentY}px)`;
+            }
+        }
+
+        window.addEventListener("mousedown", dragStart);
+        window.addEventListener("mouseup", dragEnd);
+        window.addEventListener("mousemove", drag);
+        window.addEventListener("touchstart", dragStart, { passive: false });
+        window.addEventListener("touchend", dragEnd);
+        window.addEventListener("touchmove", drag, { passive: false });
+    </script>
+</body>
+</html>
