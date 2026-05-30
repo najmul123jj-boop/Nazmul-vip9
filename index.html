@@ -2,278 +2,218 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DKWIN 30S PREMIUM UPDATE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>HGZY | Transparent Signal</title>
     <style>
-        :root {
-            --red: #ff4d4d;
-            --green: #2ecc71;
-            --white: #ffffff;
-            --yellow: #ffeb3b;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        body { 
-            margin: 0; 
-            background: #000; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            overflow: hidden; 
+        body, html {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            overflow: hidden;
+            font-family: system-ui, 'Segoe UI', sans-serif;
+            touch-action: none;
         }
-        
-        iframe { 
-            width: 100vw; 
-            height: 100vh; 
-            border: none; 
+
+        /* গেমটি ফুল স্ক্রিন থাকবে */
+        iframe {
             position: fixed;
             top: 0;
             left: 0;
+            width: 100vw;
+            height: 100vh;
+            border: none;
             z-index: 1;
         }
 
-        /* Fixed Panel Container - Top Center */
-        #fixedPanel {
+        /* প্যানেলের কালো ঘর সরিয়ে ট্রান্সপারেন্ট করা হয়েছে */
+        #pureSignalPanel {
             position: fixed;
-            top: 15%;        
-            left: 50%;
-            transform: translateX(-50%);
+            top: 60px;
+            right: 15px;
+            width: 110px;
+            background: transparent; /* ব্যাকগ্রাউন্ড রিমুভড */
             z-index: 999999;
-            pointer-events: none; /* Allows clicking through empty areas */
-            width: 100%;
+            touch-action: none;
             text-align: center;
         }
 
-        /* Password Container - Transparent Background */
-        #lock-container {
-            background: transparent; /* Removed black box */
-            padding: 0;
-            pointer-events: auto; /* Re-enable clicking for input */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #passInput {
-            width: 100px;
-            background: transparent; /* Removed black box */
-            border: none; /* Removed border */
-            border-bottom: 2px solid var(--green); /* Minimal bottom border */
-            color: var(--green);
-            text-align: center;
-            font-size: 20px;
+        /* পাসওয়ার্ড বক্স - শুধু ইনপুট ফিল্ডটি দেখা যাবে */
+        .puzzle-block {
+            background: rgba(0, 0, 0, 0.6); /* হালকা আবছা ভাব যাতে ইনপুট দেখা যায় */
+            border-radius: 12px;
             padding: 5px;
-            border-radius: 0;
-            outline: none;
-            text-shadow: 0 0 5px var(--green);
-            font-weight: bold;
+            border: 1px solid #ffd966aa;
         }
-
-        #passInput::placeholder {
-            color: rgba(46, 204, 113, 0.5);
+        
+        .puzzle-block input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #FFE484;
+            text-align: center;
             font-size: 14px;
-        }
-
-        .label-text {
-            color: var(--green);
-            font-size: 12px;
-            margin-bottom: 5px;
             font-weight: bold;
-            text-shadow: 1px 1px 2px #000;
-            letter-spacing: 1px;
-        }
-
-        /* Signal Content Container - Transparent Background */
-        #signal-content {
-            display: none;
-            background: transparent; /* Removed black box */
-            padding: 0;
-            min-width: 150px;
-            pointer-events: auto;
-        }
-
-        /* Timer Styles */
-        .timer-text {
-            font-size: 18px;
-            color: var(--white);
-            font-weight: bold;
-            text-shadow: 2px 2px 4px #000, 0 0 10px #000;
-            margin-bottom: 10px;
+            outline: none;
             letter-spacing: 2px;
         }
 
-        /* Prediction Text Styles */
-        #prediction-text {
-            font-size: 42px; 
-            font-weight: 900;
-            margin: 0;
-            line-height: 1.1;
-            display: inline-block;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        /* সিগন্যাল এরিয়া - কোন কালো ঘর নেই */
+        .signal-area {
+            background: transparent;
             text-align: center;
         }
 
-        /* Neon Glow Effects */
-        .big-style { 
-            color: var(--green); 
-            text-shadow: 0 0 20px rgba(46, 204, 113, 0.8), 2px 2px 0px #000; 
-        }
-        .small-style { 
-            color: var(--red); 
-            text-shadow: 0 0 20px rgba(255, 77, 77, 0.8), 2px 2px 0px #000; 
-        }
-        
-        /* Loading Dots Animation */
-        .loading-container {
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-            height: 50px; /* Match height of text */
-            align-items: center;
+        .seconds-label {
+            font-size: 10px;
+            color: #0ff;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px #000;
         }
 
-        .dot {
-            width: 10px;
-            height: 10px;
-            background-color: var(--yellow);
-            border-radius: 50%;
+        .seconds-number {
+            font-size: 22px;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 10px cyan, 0 0 20px cyan;
+        }
+
+        /* সিগন্যাল টেক্সট (BIG/SMALL) */
+        .prediction-area {
+            margin-top: 5px;
+            font-weight: 900;
+        }
+
+        .signal-big {
+            font-size: 28px;
+            color: #00FFAA;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        .signal-small {
+            font-size: 28px;
+            color: #FF4D4D;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        .loading-dots span {
+            width: 6px;
+            height: 6px;
+            background: #0ff;
             display: inline-block;
-            box-shadow: 0 0 10px var(--yellow);
-            animation: pulse 1.5s infinite ease-in-out both;
+            border-radius: 50%;
+            animation: pulseLoad 0.6s infinite alternate;
         }
+        @keyframes pulseLoad { to { opacity: 0.2; } }
 
-        .dot:nth-child(1) { animation-delay: -0.32s; }
-        .dot:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes pulse {
-            0%, 80%, 100% { 
-                transform: scale(0);
-                opacity: 0.5;
-            } 
-            40% { 
-                transform: scale(1.2);
-                opacity: 1;
-            }
-        }
-
-        .urgent { 
-            color: #ff4d4d !important; 
-            animation: blink 0.5s infinite alternate;
-        }
-
-        @keyframes blink {
-            from { opacity: 1; }
-            to { opacity: 0.5; }
+        .drag-handle {
+            font-size: 8px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 2px;
         }
     </style>
 </head>
 <body>
 
-<!-- Game Iframe -->
 <iframe src="https://hgnice.cc/#/register?invitationCode=511711502736"></iframe>
 
-<!-- UI Overlay -->
-<div id="fixedPanel">
-    <!-- Password Box -->
-    <div id="lock-container">
-        <div class="label-text">ENTER PIN</div>
-        <input type="password" id="passInput" placeholder="•••••" oninput="checkPassword(this.value)" autocomplete="off">
+<div id="pureSignalPanel">
+    <div id="pinBox" class="puzzle-block">
+        <input type="password" id="pinCode" placeholder="PIN" inputmode="numeric" maxlength="6">
     </div>
 
-    <!-- Signal Display Panel -->
-    <div id="signal-content">
-        <div class="timer-text"><span id="time-left">30</span>s</div>
-        <div id="prediction-text">
-            <!-- Content injected via JS -->
+    <div id="signalBox" style="display: none;">
+        <div class="signal-area">
+            <div class="seconds-label">HGZY 30s</div>
+            <div id="timerNum" class="seconds-number">30</div>
+            <div class="prediction-area" id="predictionBlock">
+                <div class="signal-big">---</div>
+            </div>
+            <div class="drag-handle">:::::</div>
         </div>
     </div>
 </div>
-const firebaseConfig = {
-            apiKey: "AIzaSyA4MXyCyvpAL8NQ23j3TWxiszPofWInVA",
-            authDomain: "wingo-ai-624fb.firebaseapp.com",
-            databaseURL: "https://wingo-ai-624fb-default-rtdb.firebaseio.com",
-            projectId: "wingo-ai-624fb",
-            appId: "1:266167882150:web:7f0f83606dfd4bcd8aff67"
-        };
+
 <script>
-    const CYCLE = 30;
-    let isUnlocked = false;
-
-    // Function to check user input password
-    function checkPassword(val) {
-        if(val === "123459") { 
-            isUnlocked = true;
-            // Hide password container smoothly
-            document.getElementById("lock-container").style.display = "none";
-            // Show signal container
-            document.getElementById("signal-content").style.display = "block";
-            
-            // Start the signal logic immediately
-            updateSignal();
-        }
-    }
-
-    // Main timer loop
-    function updateTick() {
-        const now = new Date();
-        const seconds = now.getSeconds();
-        const remain = CYCLE - (seconds % CYCLE);
+    (function() {
+        const CYCLE_SEC = 30;
+        const VALID_PIN = "123456";
         
-        const timerDisplay = document.getElementById("time-left");
+        const panel = document.getElementById('pureSignalPanel');
+        const pinContainer = document.getElementById('pinBox');
+        const pinInput = document.getElementById('pinCode');
+        const signalContainer = document.getElementById('signalBox');
+        const timerSpan = document.getElementById('timerNum');
+        const predictionDiv = document.getElementById('predictionBlock');
+        
+        let unlocked = false;
+        let lastCycleMarker = -1;
 
-        if(timerDisplay) {
-            // Format timer to show '05' instead of '5'
-            timerDisplay.textContent = remain < 10 ? "0" + remain : remain;
-            
-            // Add urgent visual cue when time is low
-            if(remain <= 5) timerDisplay.classList.add("urgent");
-            else timerDisplay.classList.remove("urgent");
+        function getRemaining() {
+            const nowSec = new Date().getSeconds();
+            return CYCLE_SEC - (nowSec % CYCLE_SEC);
         }
 
-        // Trigger signal update at the start of a new cycle (30s)
-        if (remain === CYCLE && isUnlocked) {
-            updateSignal();
-        }
-    }
-
-    // Function to handle the loading and result display
-    function updateSignal() {
-        const predText = document.getElementById("prediction-text");
-        
-        // 1. Start Loading Effect (Three Dots)
-        // We create HTML structure for the dots
-        predText.innerHTML = `
-            <div class="loading-container">
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
-            </div>
-        `;
-        
-        // 2. Wait 5.5 seconds (5500ms) then show result
-        setTimeout(() => {
-            // Fade out the dots
-            predText.style.opacity = "0";
-            predText.style.transform = "scale(0.8)";
-
+        function generateSignal() {
+            predictionDiv.innerHTML = `<div class="loading-dots"><span></span><span></span><span></span></div>`;
             setTimeout(() => {
-                // Generate random result
-                const result = Math.random() > 0.5 ? "BIG" : "SMALL";
-                
-                // Set text and apply color style
-                predText.textContent = result;
-                predText.className = result === "BIG" ? "big-style" : "small-style";
-                
-                // Fade in the result
-                predText.style.opacity = "1";
-                predText.style.transform = "scale(1)";
-            }, 200); // Short delay for fade out transition
+                const isBig = Math.random() > 0.5;
+                predictionDiv.innerHTML = isBig ? 
+                    `<div class="signal-big">BIG</div>` : 
+                    `<div class="signal-small">SMALL</div>`;
+            }, 1500);
+        }
 
-        }, 5500); // 5.5 seconds loading time
-    }
+        function updateLogic() {
+            const rem = getRemaining();
+            timerSpan.innerText = rem;
+            
+            if (rem === CYCLE_SEC) {
+                const marker = Math.floor(Date.now() / 1000 / CYCLE_SEC);
+                if (lastCycleMarker !== marker) {
+                    lastCycleMarker = marker;
+                    generateSignal();
+                }
+            }
+        }
 
-    // Run timer every second
-    setInterval(updateTick, 1000);
-    // Initialize immediately
-    updateTick();
+        pinInput.addEventListener('input', (e) => {
+            if (e.target.value === VALID_PIN) {
+                unlocked = true;
+                pinContainer.style.display = 'none';
+                signalContainer.style.display = 'block';
+                generateSignal();
+                setInterval(updateLogic, 200);
+            }
+        });
+
+        // ড্র্যাগ করার সুবিধা
+        let isDragging = false;
+        let offsetX, offsetY;
+
+        panel.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            offsetX = e.touches[0].clientX - panel.offsetLeft;
+            offsetY = e.touches[0].clientY - panel.offsetTop;
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (isDragging) {
+                panel.style.left = (e.touches[0].clientX - offsetX) + 'px';
+                panel.style.top = (e.touches[0].clientY - offsetY) + 'px';
+                panel.style.right = 'auto';
+            }
+        });
+
+        window.addEventListener('touchend', () => { isDragging = false; });
+    })();
 </script>
 
 </body>
