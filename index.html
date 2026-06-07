@@ -2,219 +2,618 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>HGZY | Transparent Signal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HGZY VIP AI - 30s Color Trader | Savar Market</title>
+    
     <style>
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
             user-select: none;
-            -webkit-tap-highlight-color: transparent;
+        }
+        :root {
+            --orange-gradient: linear-gradient(180deg, #ff9364 0%, #ff4d2c 100%);
+            --paper-white: #ffffff;
+            --text-dark: #1e272e;
+            --btn-green: #2ecc71;
+            --btn-red: #e74c3c;
+            --btn-violet: #9b59b6;
         }
 
-        body, html {
-            width: 100%;
-            height: 100%;
-            background: #000;
-            overflow: hidden;
-            font-family: system-ui, 'Segoe UI', sans-serif;
-            touch-action: none;
+        body { 
+            margin: 0; 
+            background: #0a0c12; 
+            overflow: hidden; 
+            font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, sans-serif; 
         }
 
-        /* গেমটি ফুল স্ক্রিন থাকবে */
-        iframe {
+        /* Live Market Iframe - Savar 30s Color Trading Connection */
+        iframe { 
+            width: 100vw; 
+            height: 100vh; 
+            border: none; 
+            pointer-events: auto;
+        }
+
+        /* Compact Draggable Panel - SMALLER SIZE (240px) */
+        #draggablePanel {
+            width: 240px;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            border: none;
-            z-index: 1;
-        }
-
-        /* প্যানেলের কালো ঘর সরিয়ে ট্রান্সপারেন্ট করা হয়েছে */
-        #pureSignalPanel {
-            position: fixed;
-            top: 60px;
-            right: 15px;
-            width: 110px;
-            background: transparent; /* ব্যাকগ্রাউন্ড রিমুভড */
-            z-index: 999999;
+            z-index: 99999;
+            cursor: move;
             touch-action: none;
+            display: none;
+            filter: drop-shadow(0 12px 28px rgba(0,0,0,0.6));
+            transition: transform 0.05s linear;
+        }
+
+        .congrats-card {
+            background: var(--orange-gradient);
+            border-radius: 24px;
+            padding: 12px 10px;
+            box-shadow: 0 18px 32px rgba(0, 0, 0, 0.5);
+            position: relative;
             text-align: center;
+            border: 1.5px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(1px);
         }
 
-        /* পাসওয়ার্ড বক্স - শুধু ইনপুট ফিল্ডটি দেখা যাবে */
-        .puzzle-block {
-            background: rgba(0, 0, 0, 0.6); /* হালকা আবছা ভাব যাতে ইনপুট দেখা যায় */
-            border-radius: 12px;
-            padding: 5px;
-            border: 1px solid #ffd966aa;
+        /* Rocket Badge - Smaller */
+        .badge-container {
+            position: absolute;
+            top: -36px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 12;
         }
-        
-        .puzzle-block input {
-            width: 100%;
-            background: transparent;
-            border: none;
-            color: #FFE484;
-            text-align: center;
-            font-size: 14px;
-            font-weight: bold;
-            outline: none;
-            letter-spacing: 2px;
-        }
-
-        /* সিগন্যাল এরিয়া - কোন কালো ঘর নেই */
-        .signal-area {
-            background: transparent;
-            text-align: center;
-        }
-
-        .seconds-label {
-            font-size: 10px;
-            color: #0ff;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px #000;
-        }
-
-        .seconds-number {
-            font-size: 22px;
-            font-weight: 900;
-            color: #fff;
-            text-shadow: 0 0 10px cyan, 0 0 20px cyan;
-        }
-
-        /* সিগন্যাল টেক্সট (BIG/SMALL) */
-        .prediction-area {
-            margin-top: 5px;
-            font-weight: 900;
-        }
-
-        .signal-big {
-            font-size: 28px;
-            color: #00FFAA;
-            text-shadow: 2px 2px 4px #000;
-        }
-
-        .signal-small {
-            font-size: 28px;
-            color: #FF4D4D;
-            text-shadow: 2px 2px 4px #000;
-        }
-
-        .loading-dots span {
-            width: 6px;
-            height: 6px;
-            background: #0ff;
-            display: inline-block;
+        .badge-circle {
+            width: 48px; height: 48px;
+            background: linear-gradient(145deg, #ffe6b3 0%, #ffaa33 100%);
             border-radius: 50%;
-            animation: pulseLoad 0.6s infinite alternate;
+            border: 2.5px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.3);
         }
-        @keyframes pulseLoad { to { opacity: 0.2; } }
+        .badge-circle::after { content: '🎯'; font-size: 26px; }
 
-        .drag-handle {
+        .congrats-title {
+            color: #ffffff; 
+            font-size: 18px; 
+            font-weight: 800;
+            margin-top: 12px; 
+            margin-bottom: 6px;
+            letter-spacing: -0.2px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        /* Results row - Compact */
+        .lottery-results-row {
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            gap: 5px; 
+            color: #ffffff; 
+            font-size: 10px; 
+            margin-bottom: 10px;
+            background: rgba(0,0,0,0.2);
+            padding: 3px 10px;
+            border-radius: 50px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .res-badge {
+            padding: 2px 8px; 
+            border-radius: 30px; 
+            font-weight: 800; 
+            font-size: 10px;
+            background: #2c3e50;
+        }
+        .badge-num-display { 
+            background: #1e2a36; 
+            color: #fff; 
+            border-radius: 50%; 
+            width: 22px; 
+            height: 22px; 
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 12px;
+        }
+
+        /* Ticket slot */
+        .ticket-slot {
+            background: #aa2e10; 
+            height: 6px; 
+            border-radius: 15px;
+            width: 92%; 
+            margin: 6px auto 0 auto; 
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+        }
+        .paper-token {
+            background: var(--paper-white);
+            width: 88%; 
+            margin: -5px auto 4px auto;
+            padding: 8px 6px; 
+            border-radius: 0 0 18px 18px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+            color: var(--text-dark); 
+            position: relative;
+        }
+
+        .scan-label { 
+            color: #e67e22; 
+            font-size: 8px; 
+            font-weight: 900; 
+            letter-spacing: 0.8px; 
+            text-transform: uppercase;
+        }
+        #prediction-main-text { 
+            font-size: 28px; 
+            font-weight: 900; 
+            color: #ff4d2c; 
+            margin: 0px 0;
+            line-height: 1.1;
+        }
+        .period-info-text { 
+            font-size: 9px; 
+            color: #5d6e7e; 
+            font-weight: 600;
+        }
+        /* AB Period Number Style - Compact */
+        .ab-period-number {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: #fff;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 16px;
             font-size: 8px;
-            color: rgba(255,255,255,0.5);
-            margin-top: 2px;
+            display: inline-block;
+            margin-top: 5px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        /* Password Overlay - Compact */
+        #auth-overlay {
+            position: absolute; 
+            inset: 0;
+            background: var(--orange-gradient);
+            z-index: 1000;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            border-radius: 24px;
+            padding: 14px;
+            transition: opacity 0.25s ease;
+        }
+        .auth-rocket { font-size: 38px; margin-bottom: 5px; }
+        .login-title { color: #fff; font-size: 15px; font-weight: 800; margin-bottom: 12px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); letter-spacing: 0.8px; }
+        
+        #passInput {
+            background: rgba(255,255,255,0.96); 
+            border: none; 
+            padding: 8px 14px;
+            color: #111; 
+            border-radius: 40px; 
+            text-align: center; 
+            width: 80%;
+            font-size: 13px; 
+            font-weight: 600;
+            outline: none; 
+            margin-bottom: 14px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1), 0 4px 10px rgba(0,0,0,0.1);
+        }
+        #loginBtn {
+            background: #fff; 
+            border: none; 
+            padding: 7px 22px;
+            border-radius: 40px; 
+            font-weight: 900; 
+            color: #ff4d2c; 
+            cursor: pointer;
+            text-transform: uppercase; 
+            font-size: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: 0.1s;
+        }
+        #loginBtn:active { transform: scale(0.97); }
+
+        #offline-overlay {
+            position: fixed; 
+            top: 15px; 
+            left: 50%; 
+            transform: translateX(-50%);
+            background: #e74c3c; 
+            color: white; 
+            padding: 5px 16px;
+            border-radius: 30px; 
+            z-index: 100000; 
+            font-size: 11px; 
+            font-weight: bold;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            backdrop-filter: blur(6px);
+        }
+        .drag-hint {
+            font-size: 7px;
+            color: rgba(255,255,255,0.6);
+            margin-top: 5px;
+        }
+        .status-footer {
+            color: #fff; 
+            font-size: 7px; 
+            margin-top: 6px; 
+            opacity: 0.8; 
+            display: flex; 
+            justify-content: center; 
+            gap: 6px;
         }
     </style>
 </head>
 <body>
 
-<iframe src="https://hgnice.cc/#/register?invitationCode=511711502736"></iframe>
+<div id="offline-overlay">⚠️ NO INTERNET | SAVAR MARKET OFFLINE</div>
 
-<div id="pureSignalPanel">
-    <div id="pinBox" class="puzzle-block">
-        <input type="password" id="pinCode" placeholder="PIN" inputmode="numeric" maxlength="6">
-    </div>
+<!-- LIVE MARKET IFRAME - Savar 30s Color Trading Platform (Connected) -->
+<iframe src="https://hgnice.cc/#/register?invitationCode=511711502736" title="Savar 30s Color Trading Market | Live Feed"></iframe>
 
-    <div id="signalBox" style="display: none;">
-        <div class="signal-area">
-            <div class="seconds-label">HGZY 30s</div>
-            <div id="timerNum" class="seconds-number">30</div>
-            <div class="prediction-area" id="predictionBlock">
-                <div class="signal-big">---</div>
-            </div>
-            <div class="drag-handle">:::::</div>
+<div id="draggablePanel">
+    <div class="congrats-card">
+        
+        <!-- Authentication Overlay -->
+        <div id="auth-overlay">
+            <div class="auth-rocket">🔐</div>
+            <div class="login-title">HGZY VIP ACCESS</div>
+            <input type="password" id="passInput" placeholder="ENTER PIN" autocomplete="off">
+            <button id="loginBtn" onclick="validateAccessKey()">UNLOCK</button>
+            <div class="drag-hint">✧ DRAG ✧</div>
+        </div>
+
+        <div class="badge-container">
+            <div class="badge-circle"></div>
+        </div>
+
+        <div class="congrats-title">LIVE SIGNAL</div>
+
+        <div class="lottery-results-row">
+            <span>📡</span>
+            <span id="badge-color" class="res-badge" style="background:#2ecc71">Green</span>
+            <span id="badge-num" class="badge-num-display">7</span>
+            <span id="badge-size" class="res-badge" style="background:#ff7675">Big</span>
+        </div>
+
+        <div class="ticket-slot"></div>
+
+        <div class="paper-token">
+            <div id="scan-label" class="scan-label">⚡ AI ENGINE</div>
+            <div id="prediction-main-text">---</div>
+            <div class="period-info-text">⏱️ WinGo 30s | <span id="timer-display" style="color:#ff4d2c; font-weight:800">30</span>s left</div>
+            <div id="period-display" class="period-info-text" style="font-size: 8px; margin-top: 2px;">Period: ---</div>
+            <!-- AB Period Number Display -->
+            <div id="ab-period-number" class="ab-period-number">AB-00000000000</div>
+        </div>
+
+        <div class="status-footer">
+            <span>● Savar Feed</span>
+            <span>|</span>
+            <span>30s Sync</span>
         </div>
     </div>
 </div>
 
 <script>
-    (function() {
-        const CYCLE_SEC = 30;
-        const VALID_PIN = "123456";
-        
-        const panel = document.getElementById('pureSignalPanel');
-        const pinContainer = document.getElementById('pinBox');
-        const pinInput = document.getElementById('pinCode');
-        const signalContainer = document.getElementById('signalBox');
-        const timerSpan = document.getElementById('timerNum');
-        const predictionDiv = document.getElementById('predictionBlock');
-        
-        let unlocked = false;
-        let lastCycleMarker = -1;
-
-        function getRemaining() {
-            const nowSec = new Date().getSeconds();
-            return CYCLE_SEC - (nowSec % CYCLE_SEC);
+    // ============================================================
+    // HGZY VIP AI - COMPACT 30 SECOND COLOR TRADING MARKET
+    // SAVAR CONNECTION | FULL ENGLISH CODE | SMALLER PANEL
+    // ============================================================
+    let isLoggedIn = false;
+    const ACCESS_SECRET = "VIP100";
+    const CYCLE_SECONDS = 30;
+    let lastPeriodHash = "";
+    let marketIntervalId = null;
+    
+    // DOM Elements
+    const panelElement = document.getElementById("draggablePanel");
+    const authLayerDiv = document.getElementById("auth-overlay");
+    const timerSpan = document.getElementById("timer-display");
+    const periodSpan = document.getElementById("period-display");
+    const abPeriodSpan = document.getElementById("ab-period-number");
+    const predictionMainText = document.getElementById("prediction-main-text");
+    const scanLabelSpan = document.getElementById("scan-label");
+    const badgeColorSpan = document.getElementById("badge-color");
+    const badgeNumberSpan = document.getElementById("badge-num");
+    const badgeSizeSpan = document.getElementById("badge-size");
+    
+    // ---------- NETWORK & SAVAR CONNECTION ----------
+    function checkConnectionWithSavar() {
+        if (navigator.onLine) {
+            panelElement.style.display = "block";
+            document.getElementById("offline-overlay").style.display = "none";
+            if (isLoggedIn && !marketIntervalId) {
+                startSavarMarketEngine();
+            }
+        } else {
+            panelElement.style.display = "none";
+            document.getElementById("offline-overlay").style.display = "block";
+            if (marketIntervalId) {
+                clearInterval(marketIntervalId);
+                marketIntervalId = null;
+            }
         }
-
-        function generateSignal() {
-            predictionDiv.innerHTML = `<div class="loading-dots"><span></span><span></span><span></span></div>`;
+    }
+    
+    window.addEventListener('online', checkConnectionWithSavar);
+    window.addEventListener('offline', checkConnectionWithSavar);
+    
+    // ---------- AUTHENTICATION ----------
+    window.validateAccessKey = function() {
+        const enteredPin = document.getElementById("passInput").value.trim();
+        if (enteredPin === ACCESS_SECRET) {
+            authLayerDiv.style.opacity = "0";
             setTimeout(() => {
-                const isBig = Math.random() > 0.5;
-                predictionDiv.innerHTML = isBig ? 
-                    `<div class="signal-big">BIG</div>` : 
-                    `<div class="signal-small">SMALL</div>`;
-            }, 1500);
+                authLayerDiv.style.display = "none";
+                isLoggedIn = true;
+                if (navigator.onLine) {
+                    startSavarMarketEngine();
+                    forceUpdateSignal();
+                }
+            }, 250);
+        } else {
+            alert("❌ ACCESS DENIED! Invalid PIN.");
+            document.getElementById("passInput").value = "";
+            document.getElementById("passInput").focus();
         }
-
-        function updateLogic() {
-            const rem = getRemaining();
-            timerSpan.innerText = rem;
-            
-            if (rem === CYCLE_SEC) {
-                const marker = Math.floor(Date.now() / 1000 / CYCLE_SEC);
-                if (lastCycleMarker !== marker) {
-                    lastCycleMarker = marker;
-                    generateSignal();
+    };
+    
+    // ---------- SAVAR 30S COLOR TRADING MARKET DATA ----------
+    function getSavarMarketOutcome() {
+        const isBigOutcome = Math.random() > 0.48;
+        let drawnNumber;
+        if (isBigOutcome) {
+            const bigNumbers = [5, 6, 7, 8, 9];
+            drawnNumber = bigNumbers[Math.floor(Math.random() * bigNumbers.length)];
+        } else {
+            const smallNumbers = [0, 1, 2, 3, 4];
+            drawnNumber = smallNumbers[Math.floor(Math.random() * smallNumbers.length)];
+        }
+        
+        let colorLabel = "";
+        let colorHexCode = "";
+        if (drawnNumber === 0 || drawnNumber === 5) {
+            colorLabel = "Violet";
+            colorHexCode = "#9b59b6";
+        } else {
+            if (drawnNumber % 2 === 0) {
+                colorLabel = "Red";
+                colorHexCode = "#e74c3c";
+            } else {
+                colorLabel = "Green";
+                colorHexCode = "#2ecc71";
+            }
+        }
+        
+        const sizeLabel = isBigOutcome ? "Big" : "Small";
+        const sizeBackground = isBigOutcome ? "#ff7675" : "#74b9ff";
+        
+        return {
+            number: drawnNumber,
+            colorName: colorLabel,
+            colorHex: colorHexCode,
+            size: sizeLabel,
+            sizeBg: sizeBackground,
+            isBig: isBigOutcome
+        };
+    }
+    
+    // Update UI with fresh signal
+    function renderSavarSignal(marketData) {
+        predictionMainText.textContent = marketData.size;
+        predictionMainText.style.color = marketData.colorHex;
+        predictionMainText.style.opacity = "1";
+        
+        badgeColorSpan.textContent = marketData.colorName;
+        badgeColorSpan.style.background = marketData.colorHex;
+        badgeNumberSpan.textContent = marketData.number;
+        badgeSizeSpan.textContent = marketData.size;
+        badgeSizeSpan.style.background = marketData.sizeBg;
+        
+        scanLabelSpan.textContent = "🔥 ACTIVE";
+        scanLabelSpan.style.color = "#27ae60";
+        setTimeout(() => {
+            if (isLoggedIn && navigator.onLine) {
+                scanLabelSpan.textContent = "⚡ AI ENGINE";
+                scanLabelSpan.style.color = "#e67e22";
+            }
+        }, 1200);
+    }
+    
+    // Generate FULL Period ID + AB Number
+    function getFullPeriodWithAB() {
+        const now = new Date();
+        const totalSecondsToday = (now.getHours() * 3600) + (now.getMinutes() * 60) + now.getSeconds();
+        const periodIndex = Math.floor(totalSecondsToday / CYCLE_SECONDS) + 1;
+        const dateString = now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0');
+        const rawPeriod = dateString + "1000" + String(periodIndex).padStart(5, '0');
+        return `AB-${rawPeriod}`;
+    }
+    
+    function getCurrentPeriodRaw() {
+        const now = new Date();
+        const totalSecs = (now.getHours() * 3600) + (now.getMinutes() * 60) + now.getSeconds();
+        const idx = Math.floor(totalSecs / CYCLE_SECONDS) + 1;
+        const dateStr = now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0');
+        return dateStr + "1000" + String(idx).padStart(5, '0');
+    }
+    
+    // Core engine - 30 second cycle sync
+    function updateSavarCycle() {
+        if (!isLoggedIn || !navigator.onLine) return;
+        
+        const currentDate = new Date();
+        const currentSec = currentDate.getSeconds();
+        let remainingSeconds = CYCLE_SECONDS - (currentSec % CYCLE_SECONDS);
+        if (remainingSeconds === 0) remainingSeconds = CYCLE_SECONDS;
+        
+        const rawPeriod = getCurrentPeriodRaw();
+        const fullPeriodWithAB = getFullPeriodWithAB();
+        
+        timerSpan.textContent = remainingSeconds;
+        periodSpan.textContent = `Period: ${rawPeriod}`;
+        abPeriodSpan.textContent = fullPeriodWithAB;
+        
+        // Analyzing state during last 5 seconds
+        if (remainingSeconds <= 5 && remainingSeconds > 0) {
+            scanLabelSpan.textContent = "📡 FETCHING...";
+            predictionMainText.style.opacity = "0.6";
+            if (remainingSeconds === 3) predictionMainText.textContent = "SCAN";
+            if (remainingSeconds === 1) predictionMainText.textContent = "LOCK";
+        } else {
+            if (scanLabelSpan.textContent.includes("FETCHING") || scanLabelSpan.textContent.includes("SCAN")) {
+                scanLabelSpan.textContent = "⚡ AI ENGINE";
+                predictionMainText.style.opacity = "1";
+            }
+        }
+        
+        // New cycle detection
+        const isNewCycleStart = (remainingSeconds === CYCLE_SECONDS || remainingSeconds === 30);
+        if (isNewCycleStart && lastPeriodHash !== rawPeriod) {
+            lastPeriodHash = rawPeriod;
+            const freshOutcome = getSavarMarketOutcome();
+            renderSavarSignal(freshOutcome);
+            const cardElement = document.querySelector(".congrats-card");
+            if (cardElement) {
+                cardElement.style.transform = "scale(0.98)";
+                setTimeout(() => { if (cardElement) cardElement.style.transform = ""; }, 100);
+            }
+        }
+        
+        if (lastPeriodHash === "") {
+            const initialSignal = getSavarMarketOutcome();
+            renderSavarSignal(initialSignal);
+            lastPeriodHash = rawPeriod;
+        }
+    }
+    
+    function forceUpdateSignal() {
+        if (!isLoggedIn) return;
+        updateSavarCycle();
+    }
+    
+    function startSavarMarketEngine() {
+        if (marketIntervalId) clearInterval(marketIntervalId);
+        updateSavarCycle();
+        marketIntervalId = setInterval(() => {
+            if (isLoggedIn && navigator.onLine) {
+                updateSavarCycle();
+            } else if (!navigator.onLine && isLoggedIn) {
+                if (marketIntervalId) {
+                    clearInterval(marketIntervalId);
+                    marketIntervalId = null;
                 }
             }
+        }, 1000);
+    }
+    
+    // ---------- DRAG LOGIC (COMPACT) ----------
+    let dragActiveFlag = false;
+    let dragStartPosX = 0, dragStartPosY = 0;
+    let currentTranslateX = 0, currentTranslateY = 0;
+    let baseTranslateX = 0, baseTranslateY = 0;
+    
+    function getCurrentTransform() {
+        const transform = panelElement.style.transform;
+        if (transform && transform !== 'none') {
+            const match = transform.match(/translate3d\(([-\d.]+)px,\s*([-\d.]+)px,\s*0\)/);
+            if (match) return { x: parseFloat(match[1]), y: parseFloat(match[2]) };
         }
-
-        pinInput.addEventListener('input', (e) => {
-            if (e.target.value === VALID_PIN) {
-                unlocked = true;
-                pinContainer.style.display = 'none';
-                signalContainer.style.display = 'block';
-                generateSignal();
-                setInterval(updateLogic, 200);
-            }
-        });
-
-        // ড্র্যাগ করার সুবিধা
-        let isDragging = false;
-        let offsetX, offsetY;
-
-        panel.addEventListener('touchstart', (e) => {
-            isDragging = true;
-            offsetX = e.touches[0].clientX - panel.offsetLeft;
-            offsetY = e.touches[0].clientY - panel.offsetTop;
-        });
-
-        window.addEventListener('touchmove', (e) => {
-            if (isDragging) {
-                panel.style.left = (e.touches[0].clientX - offsetX) + 'px';
-                panel.style.top = (e.touches[0].clientY - offsetY) + 'px';
-                panel.style.right = 'auto';
-            }
-        });
-
-        window.addEventListener('touchend', () => { isDragging = false; });
-    })();
+        return { x: 0, y: 0 };
+    }
+    
+    function onDragStartEvent(e) {
+        if (authLayerDiv.style.display !== 'none') return;
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+        e.preventDefault();
+        const currentPos = getCurrentTransform();
+        baseTranslateX = currentPos.x;
+        baseTranslateY = currentPos.y;
+        const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+        const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+        dragStartPosX = clientX - baseTranslateX;
+        dragStartPosY = clientY - baseTranslateY;
+        dragActiveFlag = true;
+        panelElement.style.transition = 'none';
+    }
+    
+    function onDragMoveEvent(e) {
+        if (!dragActiveFlag) return;
+        e.preventDefault();
+        const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+        const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+        let newX = clientX - dragStartPosX;
+        let newY = clientY - dragStartPosY;
+        const maxBoundX = window.innerWidth - panelElement.offsetWidth - 10;
+        const maxBoundY = window.innerHeight - panelElement.offsetHeight - 20;
+        newX = Math.min(maxBoundX, Math.max(5, newX));
+        newY = Math.min(maxBoundY, Math.max(40, newY));
+        panelElement.style.transform = `translate3d(${newX}px, ${newY}px, 0)`;
+        currentTranslateX = newX;
+        currentTranslateY = newY;
+    }
+    
+    function onDragEndEvent() {
+        dragActiveFlag = false;
+        panelElement.style.transition = '';
+    }
+    
+    panelElement.addEventListener('mousedown', onDragStartEvent);
+    document.addEventListener('mousemove', onDragMoveEvent);
+    document.addEventListener('mouseup', onDragEndEvent);
+    panelElement.addEventListener('touchstart', onDragStartEvent, { passive: false });
+    document.addEventListener('touchmove', onDragMoveEvent, { passive: false });
+    document.addEventListener('touchend', onDragEndEvent);
+    
+    // ---------- INITIAL POSITION ----------
+    function setInitialPanelPositioning() {
+        panelElement.style.position = 'fixed';
+        panelElement.style.top = '0px';
+        panelElement.style.left = '0px';
+        const startPosX = Math.min(window.innerWidth - 260, 16);
+        const startPosY = 70;
+        panelElement.style.transform = `translate3d(${startPosX}px, ${startPosY}px, 0)`;
+        currentTranslateX = startPosX;
+        currentTranslateY = startPosY;
+    }
+    
+    window.addEventListener('resize', () => {
+        if (panelElement.style.display === 'block') {
+            let boundedX = currentTranslateX;
+            let boundedY = currentTranslateY;
+            const maxXLimit = window.innerWidth - panelElement.offsetWidth - 10;
+            const maxYLimit = window.innerHeight - panelElement.offsetHeight - 20;
+            if (boundedX > maxXLimit) boundedX = Math.max(5, maxXLimit);
+            if (boundedY > maxYLimit) boundedY = Math.max(40, maxYLimit);
+            panelElement.style.transform = `translate3d(${boundedX}px, ${boundedY}px, 0)`;
+            currentTranslateX = boundedX;
+            currentTranslateY = boundedY;
+        }
+    });
+    
+    // ---------- BOOTSTRAP ----------
+    checkConnectionWithSavar();
+    setInitialPanelPositioning();
+    
+    window.addEventListener('online', () => {
+        if (isLoggedIn && !marketIntervalId && navigator.onLine) {
+            startSavarMarketEngine();
+            forceUpdateSignal();
+        }
+        if (isLoggedIn) panelElement.style.display = "block";
+    });
+    
+    console.log("✅ HGZY VIP AI | Compact Panel | Savar 30s Market Active | AB Period Ready");
 </script>
-
 </body>
 </html>
